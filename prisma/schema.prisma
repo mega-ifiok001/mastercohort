@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+}
+
+model Signup {
+  id                    String        @id @default(cuid())
+  name                  String
+  email                 String        @unique
+  whatsapp              String
+  refCode               String?
+  reference             String        @unique
+  status                PaymentStatus @default(PENDING)
+  amountKobo            Int
+  paystackTransactionId String?
+  paidAt                DateTime?
+  emailSentAt           DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@index([status])
+  @@index([refCode])
+}
