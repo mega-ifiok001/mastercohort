@@ -189,3 +189,19 @@
 .adm-pill-pending { background: #fef3c7; color: #92400e; }
 
 .adm-more { display: flex; gap: 8px; justify-content: center; margin-top: 14px; }
+
+.adm-alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+.adm-actions { flex-wrap: wrap; }
+.adm-link-btn {
+  font: inherit;
+  font-size: 12px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--accent-dark);
+  cursor: pointer;
+}
+.adm-link-btn:hover:not(:disabled) { background: #f0fdf4; border-color: var(--accent); }
+.adm-link-btn:disabled { opacity: 0.5; cursor: not-allowed; }

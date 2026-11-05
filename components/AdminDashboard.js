@@ -92,6 +92,8 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
   const [sort, setSort] = useState("newest");
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [refreshing, setRefreshing] = useState(false);
+  const [verifying, setVerifying] = useState(null); // "all" or a payment reference
+  const [notice, setNotice] = useState("");
 
   const stats = useMemo(() => {
     const paid = signups.filter((s) => s.status === "PAID");
@@ -168,6 +170,35 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
     router.refresh();
   }
 
+  async function verify(reference) {
+    setVerifying(reference || "all");
+    setNotice("");
+    try {
+      const res = await fetch("/api/admin/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reference ? { reference } : {}),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setNotice(data.error || "Could not check with Paystack.");
+      } else if (data.confirmed > 0) {
+        setNotice(
+          `${data.confirmed} payment${data.confirmed === 1 ? "" : "s"} confirmed and marked as paid. ` +
+            `${data.stillPending} still unpaid.`
+        );
+        router.refresh();
+      } else if (data.problems > 0) {
+        setNotice("Paystack could not confirm some payments (amount mismatch or a connection problem). Try again, and check your server logs.");
+      } else {
+        setNotice(`Checked ${data.checked}. Paystack has no completed payment for ${reference ? "this person" : "any of them"} yet.`);
+      }
+    } catch {
+      setNotice("Network error. Try again.");
+    }
+    setVerifying(null);
+  }
+
   function refresh() {
     setRefreshing(true);
     router.refresh();
@@ -182,6 +213,9 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
           <p className="adm-muted">Dashboard · updated {fmtDateTime(generatedAt)}</p>
         </div>
         <div className="adm-actions">
+          <button className="adm-btn" onClick={() => verify()} disabled={verifying !== null || stats.pendingCount === 0}>
+            {verifying === "all" ? "Checking Paystack…" : "Check Paystack for payments"}
+          </button>
           <button className="adm-btn" onClick={refresh} disabled={refreshing}>
             {refreshing ? "Refreshing…" : "Refresh"}
           </button>
@@ -199,6 +233,12 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
         <Kpi label="Conversion" value={stats.conversion.toFixed(1) + "%"} sub="Signups that paid" />
         <Kpi label="Today" value={naira(stats.revenueToday)} sub={`Last 7 days: ${naira(stats.revenueWeek)}`} />
       </section>
+
+      {notice && (
+        <div className="adm-alert adm-alert-info" role="status">
+          {notice}
+        </div>
+      )}
 
       {stats.emailsMissing > 0 && (
         <div className="adm-alert">
@@ -342,6 +382,16 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
                     <span className={"adm-pill " + (s.status === "PAID" ? "adm-pill-paid" : "adm-pill-pending")}>
                       {s.status === "PAID" ? "Paid" : "Not paid"}
                     </span>
+                    {s.status !== "PAID" && (
+                      <button
+                        className="adm-link-btn"
+                        onClick={() => verify(s.reference)}
+                        disabled={verifying !== null}
+                        title="Ask Paystack if this person has paid"
+                      >
+                        {verifying === s.reference ? "Checking…" : "Verify"}
+                      </button>
+                    )}
                   </td>
                   <td className="num">{s.status === "PAID" ? naira(s.amountKobo) : "—"}</td>
                   <td>{s.refCode || <span className="adm-muted">direct</span>}</td>
