@@ -93,6 +93,7 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [refreshing, setRefreshing] = useState(false);
   const [verifying, setVerifying] = useState(null); // "all" or a payment reference
+  const [resending, setResending] = useState(null); // "all" or a signup id
   const [notice, setNotice] = useState("");
 
   const stats = useMemo(() => {
@@ -199,6 +200,33 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
     setVerifying(null);
   }
 
+  async function resendEmails(id) {
+    setResending(id || "all");
+    setNotice("");
+    try {
+      const res = await fetch("/api/admin/resend-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(id ? { id } : {}),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setNotice(data.error || "Could not send emails.");
+      } else if (data.failed > 0) {
+        setNotice(`${data.sent} sent, ${data.failed} failed. Reason: ${data.error}`);
+        if (data.sent > 0) router.refresh();
+      } else if (data.sent > 0) {
+        setNotice(`Confirmation email sent to ${data.sent} student${data.sent === 1 ? "" : "s"}.`);
+        router.refresh();
+      } else {
+        setNotice("No emails needed sending.");
+      }
+    } catch {
+      setNotice("Network error. Try again.");
+    }
+    setResending(null);
+  }
+
   function refresh() {
     setRefreshing(true);
     router.refresh();
@@ -241,9 +269,14 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
       )}
 
       {stats.emailsMissing > 0 && (
-        <div className="adm-alert">
-          {stats.emailsMissing} paid student{stats.emailsMissing === 1 ? "" : "s"} did not get the confirmation email
-          (check your Resend setup). They can still use the WhatsApp link on the success page.
+        <div className="adm-alert adm-alert-row">
+          <span>
+            {stats.emailsMissing} paid student{stats.emailsMissing === 1 ? "" : "s"} did not get the confirmation email.
+            They can still use the WhatsApp link on the success page.
+          </span>
+          <button className="adm-btn" onClick={() => resendEmails()} disabled={resending !== null}>
+            {resending === "all" ? "Sending…" : "Send emails now"}
+          </button>
         </div>
       )}
 
@@ -382,6 +415,16 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
                     <span className={"adm-pill " + (s.status === "PAID" ? "adm-pill-paid" : "adm-pill-pending")}>
                       {s.status === "PAID" ? "Paid" : "Not paid"}
                     </span>
+                    {s.status === "PAID" && !s.emailSent && (
+                      <button
+                        className="adm-link-btn"
+                        onClick={() => resendEmails(s.id)}
+                        disabled={resending !== null}
+                        title="Email isn't sent yet. Send the confirmation email now"
+                      >
+                        {resending === s.id ? "Sending…" : "Send email"}
+                      </button>
+                    )}
                     {s.status !== "PAID" && (
                       <button
                         className="adm-link-btn"

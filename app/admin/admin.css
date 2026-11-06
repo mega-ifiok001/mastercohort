@@ -205,3 +205,5 @@
 }
 .adm-link-btn:hover:not(:disabled) { background: #f0fdf4; border-color: var(--accent); }
 .adm-link-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.adm-alert-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
