@@ -28,7 +28,7 @@ export default async function SuccessPage({ searchParams }) {
           <h1>You're in, {firstName}!</h1>
           <p className="tagline">
             Your payment is confirmed. Click the button below to join the WhatsApp group. That's where the
-            course happens.
+            course happens. Bonus: {COURSE.bonus.title} {COURSE.bonus.text}.
           </p>
 
           {groupLink ? (
@@ -43,7 +43,10 @@ export default async function SuccessPage({ searchParams }) {
             Join now and use the same WhatsApp number you registered with:{" "}
             <strong>{signup.whatsapp}</strong>
           </div>
-          <p className="fine">{COURSE.startDate}</p>
+          <div className="start-banner">
+            <span>Starting</span>
+            {COURSE.startShort}, {COURSE.delivery.toLowerCase()}
+          </div>
           <p className="fine">Please don't share the group link. It's for paid students only.</p>
         </div>
       </main>
