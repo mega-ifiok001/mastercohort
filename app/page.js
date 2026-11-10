@@ -62,7 +62,7 @@ export default async function Home({ searchParams }) {
 
           <section className="signup-card" id="register">
             <h2>Reserve your spot</h2>
-            <p className="signup-sub">Fill in your details, pay {price} and join the WhatsApp class group.</p>
+            <p className="signup-sub">Fill in your details, pay {price} and join the private WhatsApp class group.</p>
             <SignupForm refCode={refCode} priceLabel={price} />
           </section>
         </aside>
