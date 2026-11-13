@@ -31,3 +31,19 @@ model Signup {
   @@index([status])
   @@index([refCode])
 }
+
+model Visit {
+  id        String   @id @default(cuid())
+  visitorId String
+  path      String
+  country   String?
+  region    String?
+  city      String?
+  referrer  String?
+  device    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([visitorId])
+  @@index([country])
+}

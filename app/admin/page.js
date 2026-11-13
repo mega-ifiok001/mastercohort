@@ -4,6 +4,7 @@ import { COURSE } from "@/lib/config";
 import { isAdmin, isAdminConfigured } from "@/lib/adminAuth";
 import AdminLogin from "@/components/AdminLogin";
 import AdminDashboard from "@/components/AdminDashboard";
+import { getVisitStats } from "@/lib/visitStats";
 
 export const dynamic = "force-dynamic";
 
@@ -45,5 +46,17 @@ export default async function AdminPage() {
     createdAt: r.createdAt.toISOString(),
   }));
 
-  return <AdminDashboard signups={signups} courseTitle={COURSE.title} generatedAt={new Date().toISOString()} />;
+    const visits = await getVisitStats(30).catch((err) => {
+    console.error("visit stats failed:", err?.message || err);
+    return null;
+  });
+
+  return (
+    <AdminDashboard
+      signups={signups}
+      visits={visits}
+      courseTitle={COURSE.title}
+      generatedAt={new Date().toISOString()}
+    />
+  );
 }

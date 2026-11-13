@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { COURSE } from "@/lib/config";
+import VisitTracker from "@/components/VisitTracker";
 
 const display = Playfair_Display({
   subsets: ["latin"],
@@ -33,8 +34,13 @@ export const viewport = { themeColor: "#fbf1e4" };
 
 export default function RootLayout({ children }) {
   return (
+
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
-      <body>{children}</body>
+    
+      <body>
+        <VisitTracker />
+        {children}
+      </body>
     </html>
   );
 }

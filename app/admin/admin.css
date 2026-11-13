@@ -207,3 +207,26 @@
 .adm-link-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .adm-alert-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+
+.adm-small { font-size: 13px; }
+.adm-tab:disabled { cursor: wait; }
+.adm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 860px) {
+  .adm-grid-2 { grid-template-columns: 1fr; }
+}
+.adm-brk { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.adm-brk-row {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  overflow: hidden;
+}
+.adm-brk-bar { position: absolute; inset: 0 auto 0 0; background: #dcfce7; z-index: 0; border-radius: 8px; }
+.adm-brk-label, .adm-brk-val { position: relative; z-index: 1; }
+.adm-brk-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
+.adm-brk-val { font-weight: 600; font-variant-numeric: tabular-nums; }

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import AdminVisitors from "./AdminVisitors";
 
 const TZ = "Africa/Lagos";
 const PAGE_SIZE = 25;
@@ -85,7 +86,7 @@ function Kpi({ label, value, sub, tone }) {
   );
 }
 
-export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
+export default function AdminDashboard({ signups, visits, courseTitle, generatedAt }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("ALL");
@@ -279,6 +280,8 @@ export default function AdminDashboard({ signups, courseTitle, generatedAt }) {
           </button>
         </div>
       )}
+
+            <AdminVisitors initial={visits} />
 
       <section className="adm-grid">
         <div className="adm-card">
